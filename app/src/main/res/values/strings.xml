@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">计算器</string>
+    <string name="AC">AC</string>
+    <string name="add">+</string>
+    <string name="subtract">-</string>
+    <string name="No_0">0</string>
+    <string name="No_1">1</string>
+    <string name="No_2">2</string>
+    <string name="No_3">3</string>
+    <string name="No_4">4</string>
+    <string name="No_5">5</string>
+    <string name="No_6">6</string>
+    <string name="No_7">7</string>
+    <string name="No_8">8</string>
+    <string name="No_9">9</string>
+    <string name="Clear">&lt;=</string>
+    <string name="equal">=</string>
+    <string name="division">÷</string>
+    <string name="mult">×</string>
+    <string name="symbol">( )</string>
+    <string name="percent">%</string>
+</resources>
