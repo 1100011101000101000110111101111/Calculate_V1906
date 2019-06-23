@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.calaulate_v1906">
+    package="com.example.calculate_v1906">
 
     <application
         android:allowBackup="true"

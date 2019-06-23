@@ -1,4 +1,4 @@
-package com.example.calaulate_v1906;
+package com.example.calculate_v1906;
 
 import org.junit.Test;
 

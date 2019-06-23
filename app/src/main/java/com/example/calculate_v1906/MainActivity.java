@@ -1,4 +1,4 @@
-package com.example.calaulate_v1906;
+package com.example.calculate_v1906;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
