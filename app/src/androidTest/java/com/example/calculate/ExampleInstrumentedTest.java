@@ -1,4 +1,4 @@
-package com.example.calculate_v1906;
+package com.example.calculate;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

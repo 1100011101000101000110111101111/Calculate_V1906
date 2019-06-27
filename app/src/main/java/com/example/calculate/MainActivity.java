@@ -1,4 +1,4 @@
-package com.example.calculate_v1906;
+package com.example.calculate;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,12 +8,14 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
 public class MainActivity extends AppCompatActivity  implements View.OnClickListener{
-    StringBuilder stringExpression=new StringBuilder();//计算表达式字符
-    StringBuilder stringDisplay=new StringBuilder();//显示字符
+    private StringBuilder stringExpression=new StringBuilder();//计算表达式字符
+    private StringBuilder stringDisplay=new StringBuilder();//显示字符
+    private String Result=new String("0");
           @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,8 +68,8 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
     public void onClick(View v) {
                   expressionJudge expressionjudge = new expressionJudge();//表达式处理
                   OperationExpression operationExpression = new OperationExpression();//表达式计算
-                  TextView textView1 = (TextView) findViewById(R.id.textView1);//display
-                  TextView textView2 = (TextView) findViewById(R.id.textView2);//result
+                  TextView textView1 = (TextView) findViewById(R.id.textView1);//显示表达式
+                  TextView textView2 = (TextView) findViewById(R.id.textView2);//显示计算结果
         try {
                   switch (v.getId()) {
                       case R.id.button1:
@@ -75,6 +77,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                           stringDisplay.delete(0, stringDisplay.length());
                           textView1.setText(stringDisplay.toString());
                           textView2.setText(stringExpression.toString());
+                          Result="0";
                           break;
                       case R.id.button2:
                           expressionjudge.replace(stringDisplay, "()");//显示字符
@@ -190,16 +193,18 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                               Log.d("MainActivityEA", stringArray[i]);//打印表达式数组
                           List<String> list = operationExpression.stringExpression(stringArray);
                           for (int i = 0; i < list.size(); i++)
-                              Log.d("MainActivityRPo", list.get(i));//打印逆波兰式表达式数组
+                              Log.d("MainActivityRPN", list.get(i));//打印逆波兰式表达式数组
                           Log.d("MainActivityResult",operationExpression.ExceptionResult(stringArray));
                           //*****日志***********//
-                         textView2.setText(operationExpression.DataJudge(operationExpression.ExceptionResult(stringArray)));//计算结果
+                          Result=operationExpression.DataJudge(operationExpression.ExceptionResult(stringArray));
+                          textView2.setText(Result); //计算结果
 
                           stringDisplay.delete(0, stringDisplay.length());//清空显示缓存器
                           stringExpression.delete(0, stringExpression.length());//清空表达式寄存器
                           break;
                       default:
                           textView2.setText("err");
+                          Result="0";
                           break;
 
                   }
@@ -207,6 +212,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
             textView2.setText("err");//捕捉错误
             stringDisplay.delete(0, stringDisplay.length());//清空显示缓存器
             stringExpression.delete(0, stringExpression.length());//清空表达式寄存器
+            Result="0";
               }
 
     }
@@ -244,8 +250,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                               stringReplace.delete(stringReplace.length() - 1, stringReplace.length());//删除表达式最后不合法的运算符
                           else if (stringReplace.toString().endsWith("."))
                               stringReplace.append("0");
-
-                          for (int i=0,No=0;i<chars.length;i++) {//补全右括号
+                          for (int i=0;i<chars.length;i++) {//补全右括号
                               if (chars[i] == '(')
                               stringReplace.append(")");
                                if (chars[i]==')')
@@ -266,7 +271,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                         break;
                       default:
                           if (stringReplace.length() == 0) {
-                              stringReplace.append(0); //备注后期需要改为上次运算结果,不是默认0
+                              stringReplace.append(Result); //默认加上上次运算结果上次运算结果
                           } else if (this.judge(stringReplace.toString()))//末尾字符判断
                               stringReplace.delete(stringReplace.length() - 1, stringReplace.length());//开头检测到运算符删除
                           stringReplace.append(symbol);
@@ -280,7 +285,9 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
               String [] stringArr(String stringArr){//把字符串表达式转字符串数组方法
                   char [] chars=stringArr.toCharArray();
                   List<String> list=new ArrayList();
-                  StringBuilder stringBuilderTmp=new StringBuilder();
+                  StringBuilder stringBuilderTmp=new StringBuilder();//临时数字字符存放
+
+
               for (int i=0;i<chars.length;i++){
                 if(Character.isDigit(chars[i])|| chars[i]=='.'){
                     stringBuilderTmp.append(chars[i]);
@@ -290,20 +297,46 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                     }
                 }
                 else {
-                    if (i == 0) {
-                        list.add(String.valueOf(chars[i])); }
-                    else {
-                       if (stringBuilderTmp.length()>0){
+                    //if (i == 0) {
+                     //   list.add(String.valueOf(chars[i])); }
+                    //else {
+                       if (stringBuilderTmp.length()>0){//不为空
                            list.add(stringBuilderTmp.toString());
                            stringBuilderTmp.delete(0,stringBuilderTmp.length());
                        }
                         list.add( String.valueOf(chars[i]));
-                    }
+                    //}
                 }
 
             }
-          int size=list.size();
-            return list.toArray(new String[size]);//输出list
+             return this.minusJudge(list);
+        }
+
+        String [] minusJudge(List<String> list){//添加负数表达式方法
+                  List<String> listTmp=new LinkedList<>();
+                  int tmpIndex=0;
+                  for (int i=0;i<list.size();i++)
+                      listTmp.add(list.get(i));
+
+                  for (int i=0;i<list.size();i++)
+                      if (list.get(i).equals("-")) {//开头加括号
+                          if (i == 0) {
+                              listTmp.add(i+tmpIndex, "0");
+                              listTmp.add(i+tmpIndex, "(");
+                              listTmp.add(i+tmpIndex+4,")");
+                              tmpIndex+=3;
+
+                          }
+                          else if (list.get(i-1).equals("+")||list.get(i-1).equals("-")||//中间加括号
+                                  list.get(i-1).equals("*")||list.get(i-1).equals("/")){
+                              listTmp.add(i+tmpIndex,"0");
+                              listTmp.add(i+tmpIndex,"(");
+                              listTmp.add(i+tmpIndex+4,")");
+                              tmpIndex+=3;
+                          }
+                      }
+                  int size=listTmp.size();
+                  return listTmp.toArray(new String[size]);
 
         }
 
