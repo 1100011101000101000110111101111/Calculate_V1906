@@ -7,10 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 public class MainActivity extends AppCompatActivity  implements View.OnClickListener{
     private StringBuilder stringExpression=new StringBuilder();//计算表达式字符
@@ -284,7 +281,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
 
               String [] stringArr(String stringArr){//把字符串表达式转字符串数组方法
                   char [] chars=stringArr.toCharArray();
-                  List<String> list=new ArrayList();
+                  List<String> list=new ArrayList<>();
                   StringBuilder stringBuilderTmp=new StringBuilder();//临时数字字符存放
 
 
@@ -382,8 +379,8 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
              }
 
              public List<String> stringExpression(String[] strings) {//逆波兰式
-                 Stack stack = new Stack();
-                 List<String> list = new ArrayList<>();
+                 Stack <String>stack = new Stack<>();
+                 List<String> list = new ArrayList <>();
                  for (int i = 0; i < strings.length; i++) {
                      if (!judgeOperationSymbol(strings[i]) &&
                              !strings[i].equals("(") &&
@@ -415,7 +412,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
              }
 
             public String ExceptionResult(String[] strings){//后缀表达式计算
-                  Stack <String>stack=new Stack();
+                  Stack <String>stack=new Stack<>();
                   List<String> list=this.stringExpression(strings);
                   for (int i=0;i<list.size();i++)
                       if(!judgeOperationSymbol(list.get(i)))//如果不是操作符进栈
