@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 public class MainActivity extends AppCompatActivity  implements View.OnClickListener{
@@ -363,18 +364,21 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                  }
              }
 
-             public float getResult(float parameterRight,float parameterLeft,String stringSymbol){//获取运算符计算结果
+             public double getResult(double parameterRight,double parameterLeft,String stringSymbol){//获取运算符计算结果
+                 BigDecimal bigDecimalRight=new BigDecimal(Double.toString(parameterRight));//使用BigDecimal防止加减运算时精度丢失
+                 BigDecimal bigDecimalLeft=new BigDecimal(Double.toString(parameterLeft));
                   switch (stringSymbol){
                       case "+":
-                          return parameterLeft+parameterRight;
+                          return bigDecimalLeft.add(bigDecimalRight).doubleValue();
                       case "-":
-                          return parameterLeft-parameterRight;
+                          return bigDecimalLeft.subtract(bigDecimalRight).doubleValue();
                       case "*":
                           return parameterLeft*parameterRight;
+                          //return bigDecimalLeft.multiply(bigDecimalRight).doubleValue();
                       case "/":
-                          return parameterLeft/parameterRight;
-                          default: return -1;
-
+                         return parameterLeft/parameterRight;
+                          //return bigDecimalLeft.divide(bigDecimalRight,12,BigDecimal.ROUND_HALF_UP).doubleValue();
+                      default: return -1;
                   }
              }
 
@@ -418,14 +422,14 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                       if(!judgeOperationSymbol(list.get(i)))//如果不是操作符进栈
                           stack.push(list.get(i));
                       else if(judgeOperationSymbol(list.get(i))){//遇到操作符
-                          float result=getResult(Float.parseFloat(stack.pop()),Float.parseFloat(stack.pop()),list.get(i));
+                          double result=getResult(Double.parseDouble(stack.pop()),Double.parseDouble(stack.pop()),list.get(i));
                           stack.push(String.valueOf(result));}
                      return stack.pop();
              }
 
              public String DataJudge(String stringR){//计算结果处理
-                 if( Math.round(Float.parseFloat(stringR))-Float.parseFloat(stringR)==0)//不带小数点的返回整数
-                     return String.valueOf((int) Float.parseFloat(stringR));
+                 if( Math.round(Double.parseDouble(stringR))-Double.parseDouble(stringR)==0)//不带小数点的返回整数
+                     return String.valueOf((int) Double.parseDouble(stringR));
                  else if (stringR.equals("Infinity"))
                      return "除数不能为0";
                  else
