@@ -1,4 +1,4 @@
-package com.example.calculate;
+package com.example.simplecalculate;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 public class MainActivity extends AppCompatActivity  implements View.OnClickListener{
@@ -194,8 +195,8 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                               Log.d("MainActivityRPN", list.get(i));//打印逆波兰式表达式数组
                           Log.d("MainActivityResult",operationExpression.ExceptionResult(stringArray));
                           //*****日志***********//
-                          Result=operationExpression.DataJudge(operationExpression.ExceptionResult(stringArray));
-                          textView2.setText(Result); //计算结果
+                          textView2.setText(operationExpression.DataJudge(operationExpression.ExceptionResult(stringArray)));
+                          //计算结果
 
                           stringDisplay.delete(0, stringDisplay.length());//清空显示缓存器
                           stringExpression.delete(0, stringExpression.length());//清空表达式寄存器
@@ -215,11 +216,11 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
 
     }
     public  class expressionJudge{//表达式处理
-              boolean judge (String stringJudge){//运算符检测
+              boolean judge (String stringJudge){//末尾运算符检测
                   return (stringJudge.endsWith("-") || stringJudge.endsWith("+") ||
                           stringJudge.endsWith("×") || stringJudge.endsWith("÷")||
                           stringJudge.endsWith("*") || stringJudge.endsWith("/") ||
-                          stringJudge.endsWith("("));//不允许末尾连续出现的字符
+                          stringJudge.endsWith("("));
               }
 
               //判断运算符是否输入正确
@@ -229,8 +230,16 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                   int index = 0;
                   int indexNo=0;
                   switch (symbol) {
+                     case "-":
+                          if (stringReplace.toString().endsWith("-"))//负号不许重复
+                              stringReplace.deleteCharAt(stringReplace.length()-1);
+                          else if (stringReplace.length() == 0 && !Result.equals("0"))
+                              stringReplace.append(Result);
+                          stringReplace.append(symbol);
+                          break;
+
                       case ".":
-                          for (int i = 0; i < chars.length; i++) {
+                          for (int i = 0; i < chars.length; i++) {//一个数值只能出现一个小数点
                               if (chars[i] == '.') {
                                   bool = true;
                                   index = i;
@@ -267,11 +276,13 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                               if (indexNo>0)stringReplace.append(")");
                           }
                         break;
+
                       default:
-                          if (stringReplace.length() == 0) {
+                          if (stringReplace.length() == 0)
                               stringReplace.append(Result); //默认加上上次运算结果上次运算结果
-                          } else if (this.judge(stringReplace.toString()))//末尾字符判断
-                              stringReplace.delete(stringReplace.length() - 1, stringReplace.length());//开头检测到运算符删除
+                           else
+                              while (this.judge(stringReplace.toString()))//末尾字符判断
+                              stringReplace.delete(stringReplace.length() - 1, stringReplace.length());//运算符删除
                           stringReplace.append(symbol);
                           break;
                   }
@@ -326,7 +337,8 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
 
                           }
                           else if (list.get(i-1).equals("+")||list.get(i-1).equals("-")||//中间加括号
-                                  list.get(i-1).equals("*")||list.get(i-1).equals("/")){
+                                  list.get(i-1).equals("*")||list.get(i-1).equals("/")||
+                                  list.get(i-1).equals("(")){
                               listTmp.add(i+tmpIndex,"0");
                               listTmp.add(i+tmpIndex,"(");
                               listTmp.add(i+tmpIndex+4,")");
@@ -382,7 +394,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                   }
              }
 
-             public List<String> stringExpression(String[] strings) {//逆波兰式
+             public List<String> stringExpression(String[] strings) {//逆波兰式，核心代码
                  Stack <String>stack = new Stack<>();
                  List<String> list = new ArrayList <>();
                  for (int i = 0; i < strings.length; i++) {
@@ -391,7 +403,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                              !strings[i].equals(")"))//不是运算符和括号
                          list.add(strings[i]);
 
-                     else if (strings[i].equals("("))//为z左括号
+                     else if (strings[i].equals("("))//为左括号
                          stack.push(strings[i]);
 
                      else if (judgeOperationSymbol(strings[i])) {//为操作运算符时
@@ -428,12 +440,17 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
              }
 
              public String DataJudge(String stringR){//计算结果处理
-                 if( Math.round(Double.parseDouble(stringR))-Double.parseDouble(stringR)==0)//不带小数点的返回整数
-                     return String.valueOf((int) Double.parseDouble(stringR));
-                 else if (stringR.equals("Infinity"))
+                 if( Math.round(Double.parseDouble(stringR))-Double.parseDouble(stringR)==0){//不带小数点的返回整数
+                     Result= String.valueOf((int) Double.parseDouble(stringR));
+                     return Result;
+                 }
+                 else if (stringR.equals("Infinity")) {
+                     Result="0";
                      return "除数不能为0";
-                 else
-                     return stringR;
+                 }
+                 else{
+                     Result=stringR;
+                     return String.valueOf(new BigDecimal(Double.parseDouble(stringR)).setScale(11, RoundingMode.HALF_UP).doubleValue());}//最多保留11位小数位
              }
 
     }
