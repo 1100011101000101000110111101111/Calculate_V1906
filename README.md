@@ -1,4 +1,4 @@
-# 安卓简易计算器Calculate for Android
+# 安卓简易计算器Calculator for Android
 ## 安装包路径
 [安装包](https://github.com/1100011101000101000110111101111/Calculate_V1906/tree/master/app/release)
 * * *
